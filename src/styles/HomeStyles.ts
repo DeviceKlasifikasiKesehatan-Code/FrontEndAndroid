@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+    gap: 10,
 
     // Shadow untuk Android
     elevation: 5
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   resultTextContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'center',
+    // justifyContent: 'left',
     gap: 10
   },
 
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     color: '#555'
   },
   history: {
-    // flex: 1
+    flex: 1
   },
   historyList: {
     paddingHorizontal: 20,

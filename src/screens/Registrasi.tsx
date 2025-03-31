@@ -11,6 +11,7 @@ const RegistrasiScreen: React.FC = () => {
     const [phone, setPhone] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [deviceID, setDeviceID] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
@@ -49,6 +50,27 @@ const RegistrasiScreen: React.FC = () => {
     };
 
     const handleRegister = async () => {
+        const missingFields = [];
+
+        if (!fullName) missingFields.push("Nama Lengkap");
+        if (!nickName) missingFields.push("Nama Panggilan");
+        if (!nik) missingFields.push("NIK");
+        if (!phone) missingFields.push("Nomor Telepon");
+        if (!email) missingFields.push("Email");
+        if (!deviceID) missingFields.push("ID Perangkat");
+        if (!password) missingFields.push("Password");
+        if (!confirmPassword) missingFields.push("Ulangi Password");
+
+        if (missingFields.length > 0) {
+            alert(`Harap isi bidang berikut:\n- ${missingFields.join("\n- ")}`);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Konfirmasi password tidak cocok!");
+            return;
+        }
+
         try {
             const response = await fetch('http://192.168.1.67:3124/geni/auth/register', {
                 method: 'POST',
@@ -61,6 +83,7 @@ const RegistrasiScreen: React.FC = () => {
                     nama_panggilan: nickName,
                     sandi: password,
                     nik,
+                    id_device: deviceID,
                     nomor_telepon: phone,
                 }),
             });
@@ -71,13 +94,14 @@ const RegistrasiScreen: React.FC = () => {
                 alert(data.message);
                 navigation.navigate('Gerbang');
             } else {
-                alert(data.message);
+                alert(data.message || "Terjadi kesalahan saat registrasi.");
             }
         } catch (error) {
             console.error('Error saat registrasi:', error);
             alert('Terjadi kesalahan server');
         }
     };
+
 
 
     return (
@@ -132,6 +156,15 @@ const RegistrasiScreen: React.FC = () => {
                             onChangeText={validateEmail}
                         />
                         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="ID Perangkat"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            value={deviceID}
+                            onChangeText={setDeviceID}
+                        />
 
                         <View style={styles.passwordContainer}>
                             <TextInput

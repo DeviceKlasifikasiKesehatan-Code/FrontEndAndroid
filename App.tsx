@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   SafeAreaView,
   View,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
-  BackHandler,
-  ToastAndroid
+  ScrollView
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
@@ -14,6 +12,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import GerbangScreen from "./src/screens/Gerbang";
 import RegistrasiScreen from './src/screens/Registrasi';
 import HomeScreen from './src/screens/Home';
+import ProfilScreen from './src/screens/Profil';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -22,11 +21,11 @@ const Stack = createStackNavigator();
 const screens = [
   { name: "Home", component: HomeScreen },
   { name: "Gerbang", component: GerbangScreen },
-  { name: "Registrasi", component: RegistrasiScreen }
+  { name: "Registrasi", component: RegistrasiScreen },
+  { name: "Profil", component: ProfilScreen }
 ];
 
 const App: React.FC = () => {
-  const [initialRoute, setInitialRoute] = useState<string>('Gerbang');
   const [fontsLoaded] = useFonts({
     Montserrat: require('./assets/font/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/font/Montserrat-Medium.ttf'),
@@ -35,13 +34,16 @@ const App: React.FC = () => {
     MontserratBlack: require('./assets/font/Montserrat-Black.ttf'),
   });
 
-  // Cek token saat pertama kali aplikasi dijalankan
+  const navigationRef = useRef<any>(null);
+
   useEffect(() => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
-        if (token) {
-          setInitialRoute('Home'); // Jika token ada, arahkan ke Home
+        if (token && navigationRef.current) {
+          navigationRef.current.navigate('Home');
+        } else if (navigationRef.current) {
+          navigationRef.current.navigate('Gerbang');
         }
       } catch (error) {
         console.error('Gagal membaca token:', error);
@@ -62,7 +64,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -73,17 +75,14 @@ const App: React.FC = () => {
             keyboardShouldPersistTaps="handled"
           >
             <View style={{ flex: 1 }}>
-              <Stack.Navigator initialRouteName={initialRoute}>
+              <Stack.Navigator initialRouteName="Gerbang">
                 {screens.map((screen, index) => (
                   <Stack.Screen
                     key={index}
                     name={screen.name}
+                    component={screen.component}
                     options={{ headerShown: false }}
-                  >
-                    {(props) => (
-                      <HandleBackPress {...props} screenName={screen.name} />
-                    )}
-                  </Stack.Screen>
+                  />
                 ))}
               </Stack.Navigator>
             </View>
@@ -92,36 +91,6 @@ const App: React.FC = () => {
       </SafeAreaView>
     </NavigationContainer>
   );
-};
-
-const HandleBackPress: React.FC<{ navigation: any; screenName: string }> = ({ navigation, screenName }) => {
-  const [exitApp, setExitApp] = useState<boolean>(false);
-
-  useEffect(() => {
-    const backAction = () => {
-      if (screenName === 'Registrasi') {
-        navigation.navigate('Gerbang');
-        return true;
-      } else if (screenName === 'Gerbang') {
-        if (exitApp) {
-          BackHandler.exitApp();
-        } else {
-          ToastAndroid.show("Tekan kembali lagi untuk keluar aplikasi", ToastAndroid.SHORT);
-          setExitApp(true);
-          setTimeout(() => setExitApp(false), 2000);
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  }, [navigation, screenName, exitApp]);
-
-  const ScreenComponent = screens.find(screen => screen.name === screenName)?.component;
-  return ScreenComponent ? <ScreenComponent /> : <View />;
 };
 
 export default App;

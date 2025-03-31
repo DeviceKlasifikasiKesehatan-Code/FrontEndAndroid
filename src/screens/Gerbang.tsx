@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View, Text, Image, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import {
+    KeyboardAvoidingView, Platform, ScrollView, View, Text, Image,
+    TextInput, TouchableOpacity, ToastAndroid
+} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 import styles from "../styles/GerbangScreenStyles";
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +28,7 @@ const GerbangScreen: React.FC = () => {
     };
 
     const handleLogin = async () => {
-        setErrorMessage(null); // Reset pesan error saat mulai login
+        setErrorMessage(null);
         setEmailError('');
         setPasswordError('');
 
@@ -46,9 +50,10 @@ const GerbangScreen: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
+                await AsyncStorage.setItem('userToken', data.token); // Simpan token
                 ToastAndroid.show(data.message, ToastAndroid.SHORT);
-                console.log('Login berhasil');
-                navigation.navigate('Home');
+                console.log('Login berhasil, token disimpan');
+                navigation.replace('Home'); // Pindah ke Home
             } else {
                 if (data.message.includes("Email")) {
                     setEmailError(data.message);
@@ -127,7 +132,7 @@ const GerbangScreen: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View >
+                </View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
