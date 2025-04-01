@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "../styles/ProfilStyles";
 import { useNavigation } from "@react-navigation/native";
+import utils from "../script/utils";
 
 const ProfilScreen: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
@@ -19,7 +20,7 @@ const ProfilScreen: React.FC = () => {
                     return;
                 }
 
-                const response = await fetch("http://192.168.1.67:3124/geni/auth/cauth", {
+                const response = await fetch(`${utils.API_BASE_URL}/auth/cauth`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

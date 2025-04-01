@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import {
     KeyboardAvoidingView, Platform, ScrollView, View, Text, Image,
-    TextInput, TouchableOpacity, ToastAndroid
+    TextInput, TouchableOpacity, ToastAndroid, ActivityIndicator
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 import styles from "../styles/GerbangScreenStyles";
 import { useNavigation } from '@react-navigation/native';
+import utils from "../script/utils";
 
 const GerbangScreen: React.FC = () => {
     const [email, setEmail] = useState<string>("");
@@ -15,6 +16,8 @@ const GerbangScreen: React.FC = () => {
     const [emailError, setEmailError] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
     const navigation = useNavigation();
 
     const validateEmail = (input: string) => {
@@ -28,6 +31,8 @@ const GerbangScreen: React.FC = () => {
     };
 
     const handleLogin = async () => {
+        if (isLoading) return;
+
         setErrorMessage(null);
         setEmailError('');
         setPasswordError('');
@@ -38,8 +43,10 @@ const GerbangScreen: React.FC = () => {
             return;
         }
 
+        setIsLoading(true);
+
         try {
-            const response = await fetch('http://192.168.1.67:3124/geni/auth/login', {
+            const response = await fetch(`${utils.API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,10 +57,10 @@ const GerbangScreen: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
-                await AsyncStorage.setItem('userToken', data.token); // Simpan token
+                await AsyncStorage.setItem('userToken', data.token);
                 ToastAndroid.show(data.message, ToastAndroid.SHORT);
                 console.log('Login berhasil, token disimpan');
-                navigation.replace('Home'); // Pindah ke Home
+                navigation.replace('Home'); 
             } else {
                 if (data.message.includes("Email")) {
                     setEmailError(data.message);
@@ -67,6 +74,8 @@ const GerbangScreen: React.FC = () => {
             console.error('Login error:', error);
             setErrorMessage('Terjadi kesalahan saat login');
         }
+
+        setIsLoading(false);
     };
 
     return (
@@ -74,16 +83,10 @@ const GerbangScreen: React.FC = () => {
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-            <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
-            >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                 <View style={styles.container}>
                     <View style={styles.loginContainer}>
-                        <Image
-                            style={styles.logo}
-                            source={require('../../assets/icon-light.png')}
-                        />
+                        <Image style={styles.logo} source={require('../../assets/icon-light.png')} />
                         <Text style={styles.title}>Masuk Aplikasi</Text>
 
                         <TextInput
@@ -110,19 +113,18 @@ const GerbangScreen: React.FC = () => {
                                 onPress={() => setShowPassword(!showPassword)}
                                 style={styles.showHideButton}
                             >
-                                <Icon
-                                    name={showPassword ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="#333"
-                                />
+                                <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#333" />
                             </TouchableOpacity>
                         </View>
                         {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                            <Text style={styles.loginText}>Masuk</Text>
+                        <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={isLoading}>
+                            {isLoading ? (
+                                <ActivityIndicator size="small" color="#fff" />
+                            ) : (
+                                <Text style={styles.loginText}>Masuk</Text>
+                            )}
                         </TouchableOpacity>
 
                         <View style={styles.askRegis}>

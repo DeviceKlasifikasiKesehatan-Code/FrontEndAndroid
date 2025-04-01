@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, ScrollView, Platform, View, Text, Image, TextInpu
 import Icon from 'react-native-vector-icons/Feather';
 import styles from "../styles/RegisScreenStyles";
 import { useNavigation } from '@react-navigation/native';
+import utils from "../script/utils";
 
 const RegistrasiScreen: React.FC = () => {
     const [fullName, setFullName] = useState<string>("");
@@ -72,7 +73,7 @@ const RegistrasiScreen: React.FC = () => {
         }
 
         try {
-            const response = await fetch('http://192.168.1.67:3124/geni/auth/register', {
+            const response = await fetch(`${utils.API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
