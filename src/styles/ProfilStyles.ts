@@ -1,45 +1,109 @@
-import { StyleSheet } from 'react-native'
-
-const styles = StyleSheet.create({
+export default {
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f8f8'
+    backgroundColor: "#fff"
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center'
+  topContainer: {
+    alignItems: "center",
+    padding: 100,
+    backgroundColor: "#133E87"
+  },
+  backContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20
+  },
+  backButton: {
+    color: "white"
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white"
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginVertical: 10
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white"
+  },
+  bottomContainer: {
+    padding: 20
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5
+    fontWeight: "bold",
+    marginTop: 10
   },
   value: {
     fontSize: 16,
-    fontWeight: 'normal',
-    color: '#333'
+    color: "#555"
   },
   logoutButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: 'red',
-    borderRadius: 5,
-    alignItems: 'center'
+    backgroundColor: "red",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20
   },
   logoutText: {
-    color: 'white',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: "bold"
   },
-  errorText: {
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)"
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%"
+  },
+  modalTitle: {
     fontSize: 18,
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  cancelButton: {
+    padding: 10
+  },
+  cancelText: {
+    fontSize: 16,
+    color: "red"
+  },
+  saveButton: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5
+  },
+  saveText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold"
   }
-})
-
-export default styles
+};
