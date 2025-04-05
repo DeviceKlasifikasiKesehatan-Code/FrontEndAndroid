@@ -6,47 +6,46 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "../styles/ProfilStyles";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 import utils from "../script/utils";
+import DatePickerModal from "../components/DatePickerModal";
 
 const ProfilScreen: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [editedName, setEditedName] = useState("");
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>("");
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = await AsyncStorage.getItem("userToken");
-        if (!token) {
-          console.error("Token tidak ditemukan");
-          return;
-        }
+        if (!token) return;
 
         const response = await fetch(`${utils.API_BASE_URL}/auth/cauth`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         const data = await response.json();
-
         if (response.ok) {
           setUserData(data.user);
-        } else {
-          console.error("Gagal mengambil data:", data.message);
         }
       } catch (error) {
-        console.error("Error mengambil data pengguna:", error);
+        console.error("Error:", error);
       } finally {
         setLoading(false);
       }
@@ -56,116 +55,113 @@ const ProfilScreen: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("userToken");
-      console.log("Berhasil logout");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Gerbang" }]
-      });
-    } catch (error) {
-      console.error("Gagal logout:", error);
+    await AsyncStorage.removeItem("userToken");
+    navigation.reset({ index: 0, routes: [{ name: "Gerbang" }] });
+  };
+
+  const openEditModal = (key: string, value: string) => {
+    if (key === "tanggal_lahir") {
+      setDatePickerVisible(true);
+    } else {
+      setEditingKey(key);
+      setEditingValue(value);
+      setModalVisible(true);
     }
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
-  if (!userData) {
-    return <Text style={styles.errorText}>Data pengguna tidak tersedia</Text>;
-  }
-
-  const handleSaveName = () => {
-    // Update nama pengguna (bisa ditambahkan fungsi untuk update ke backend)
-    userData.nama_pengguna = editedName;
+  const saveEdit = () => {
+    if (editingKey) {
+      setUserData({ ...userData, [editingKey]: editingValue });
+    }
     setModalVisible(false);
   };
 
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setDatePickerVisible(false);
+    if (selectedDate) {
+      const formatted = selectedDate.toISOString().split("T")[0];
+      setUserData({ ...userData, tanggal_lahir: formatted });
+    }
+  };
+
+  if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
+
+  if (!userData) return <Text>Data tidak tersedia</Text>;
+
   return (
     <View style={styles.container}>
-      {/* Kontainer Atas */}
       <View style={styles.topContainer}>
         <View style={styles.backContainer}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" size={24} color="#000" />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-left" size={28} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profil Pengguna</Text>
         </View>
 
-        <Image
-          source={require("../../assets/user.png")}
-          style={styles.profileImage}
-        />
+        <Image source={require("../../assets/user.png")} style={styles.profileImage} />
 
         <View style={styles.nameContainer}>
-          <Text style={styles.userName}>
-            {userData.nama_pengguna}
-          </Text>
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Icon name="edit-3" size={20} color="#007BFF" />
+          <Text style={styles.userName}>{userData.nama_pengguna}</Text>
+          <TouchableOpacity style={styles.editButton} onPress={() => openEditModal("nama_pengguna", userData.nama_pengguna)}>
+            <Icon name="edit-3" size={20} color="#0D99FF" />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Kontainer Bawah */}
       <View style={styles.bottomContainer}>
-        <Text style={styles.label}>
-          Nama Panggilan:{" "}
-          <Text style={styles.value}>{userData.nama_panggilan}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Alamat: <Text style={styles.value}>{userData.alamat}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Nomor Telepon: <Text style={styles.value}>{userData.nomor_telp}</Text>
-        </Text>
-        <Text style={styles.label}>
-          NIK: <Text style={styles.value}>{userData.nik}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Email: <Text style={styles.value}>{userData.email}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Tanggal Lahir:{" "}
-          <Text style={styles.value}>{userData.tanggal_lahir}</Text>
-        </Text>
+        {[
+          { label: "Nama Panggilan", key: "nama_panggilan" },
+          { label: "Alamat", key: "alamat" },
+          { label: "Nomor Telepon", key: "nomor_telp" },
+          { label: "NIK", key: "nik" },
+          { label: "Email", key: "email" },
+          { label: "Tanggal Lahir", key: "tanggal_lahir" }
+        ].map(item => (
+          <View key={item.key} style={styles.textContainer}>
+            <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(item.key, userData[item.key])}>
+              <Icon name="edit-3" size={18} color="#0D99FF" />
+            </TouchableOpacity>
+
+            <Text style={styles.label}>
+              {item.label}: <Text style={styles.value}>{userData[item.key]}</Text>
+            </Text>
+          </View>
+        ))}
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal Edit Nama */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Nama</Text>
+            <Text style={styles.modalTitle}>Edit {editingKey}</Text>
             <TextInput
               style={styles.input}
-              value={editedName}
-              onChangeText={setEditedName}
+              value={editingValue}
+              onChangeText={setEditingValue}
             />
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.cancelButton}
-              >
-                <Text style={styles.cancelText}>Batal</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleSaveName}
-                style={styles.saveButton}
-              >
+              <TouchableOpacity onPress={saveEdit} style={styles.saveButton}>
                 <Text style={styles.saveText}>Simpan</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.cancelButton}>
+                <Text style={styles.cancelText}>Batal</Text>
+              </TouchableOpacity>
+
             </View>
           </View>
         </View>
       </Modal>
+
+      {/* Modal Date Picker */}
+      <DatePickerModal
+        visible={datePickerVisible}
+        value={userData.tanggal_lahir}
+        onChange={handleDateChange}
+      />
     </View>
   );
 };

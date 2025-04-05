@@ -13,6 +13,7 @@ import GerbangScreen from "./src/screens/Gerbang";
 import RegistrasiScreen from './src/screens/Registrasi';
 import HomeScreen from './src/screens/Home';
 import ProfilScreen from './src/screens/Profil';
+import DetailData from './src/screens/DetailData';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -22,7 +23,8 @@ const screens = [
   { name: "Home", component: HomeScreen },
   { name: "Gerbang", component: GerbangScreen },
   { name: "Registrasi", component: RegistrasiScreen },
-  { name: "Profil", component: ProfilScreen }
+  { name: "Profil", component: ProfilScreen },
+  { name: "Data", component: DetailData }
 ];
 
 const App: React.FC = () => {

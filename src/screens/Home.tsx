@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   SafeAreaView,
   Image,
@@ -8,175 +8,178 @@ import {
   FlatList,
   ActivityIndicator,
   ScrollView
-} from "react-native";
-import * as Location from "expo-location";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
-import styles from "../styles/HomeStyles";
-import { calculateBPM } from "../script/Bpm";
-import utils from "../script/utils";
+} from 'react-native'
+import * as Location from 'expo-location'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
+import styles from '../styles/HomeStyles'
+import { calculateHeartRate } from '../script/HRCalculate'
+import utils from '../script/utils'
 
 const HomeScreen: React.FC = () => {
-  const [location, setLocation] = useState<string>("Mengambil lokasi...");
+  const [location, setLocation] = useState<string>('Mengambil lokasi...')
   const [history, setHistory] = useState<
     { id_data: number; tanggal: string; durasi: number }[]
-  >([]);
-  const [nik, setNik] = useState<string | null>(null);
-  const [bpm, setBpm] = useState<string>("XX"); // State untuk menyimpan BPM
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigation = useNavigation();
+  >([])
+  const [nik, setNik] = useState<string | null>(null)
+  const [bpm, setBpm] = useState<string>('XX')
+  const [loading, setLoading] = useState<boolean>(true)
+  const [bpmLoading, setBpmLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const navigation = useNavigation()
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout
 
     const fetchUserData = async () => {
-      const token = await AsyncStorage.getItem("userToken");
+      const token = await AsyncStorage.getItem('userToken')
       try {
         if (!token) {
-          navigation.replace("Gerbang");
-          return;
+          navigation.replace('Gerbang')
+          return
         }
 
         const authResponse = await fetch(`${utils.API_BASE_URL}/auth/cauth`, {
-          method: "GET",
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           }
-        });
-        const authData = await authResponse.json();
-        if (!authResponse.ok) {
-          throw new Error(authData.message || "Gagal mendapatkan NIK");
+        })
+        const authData = await authResponse.json()
+        if (authResponse.status === 401) {
+          await AsyncStorage.removeItem('userToken')
+          navigation.replace('Gerbang')
+          return
         }
 
-        const fetchedNik = authData.user.nik;
-        setNik(fetchedNik);
+        if (!authResponse.ok) {
+          throw new Error(authData.message || 'Gagal mendapatkan NIK')
+        }
+
+        const fetchedNik = authData.user.nik
+        setNik(fetchedNik)
 
         const historyResponse = await fetch(
           `${utils.API_BASE_URL}/data/gethist/${fetchedNik}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
-        );
+        )
 
-        const historyData = await historyResponse.json();
+        const historyData = await historyResponse.json()
         if (!historyResponse.ok) {
           throw new Error(
-            historyData.message || "Gagal mendapatkan riwayat rekaman"
-          );
+            historyData.message || 'Gagal mendapatkan riwayat rekaman'
+          )
         }
 
         const formattedHistory = historyData.history.map((item: any) => {
           const [year, month, day] = item.created_at_wib
-            .split("T")[0]
-            .split("-");
+            .split('T')[0]
+            .split('-')
           return {
             id_data: item.id_data,
             tanggal: `${day}/${month}/${year.slice(2)}`,
             durasi: item.durasi || 0
-          };
-        });
+          }
+        })
 
-        setHistory(formattedHistory);
+        setHistory(formattedHistory)
       } catch (err) {
-        setError(err.message);
+        setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    fetchUserData();
-    interval = setInterval(fetchUserData, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setLocation("Izin lokasi ditolak");
-        return;
-      }
-
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      const reverseGeo = await Location.reverseGeocodeAsync(
-        currentLocation.coords
-      );
-      if (reverseGeo.length > 0) {
-        setLocation(reverseGeo[0].city || "Lokasi tidak ditemukan");
-      }
-    })();
-  }, []);
-
-  const extractDurationFromId = (id_data: string): string => {
-    const match = id_data.match(/\|(\d+)_/);
-    if (!match) return "0 detik";
-    const duration = parseInt(match[1]);
-    return duration >= 60
-      ? `${Math.floor(duration / 60)} menit`
-      : `${duration} detik`;
-  };
-
-  const fetchBPMData = async () => {
-    if (!history.length) {
-      console.warn("History kosong, tidak ada ID untuk dikirim.");
-      setBpm("XX");
-      return;
     }
 
-    const id_data = encodeURIComponent(history[0].id_data);
-    console.log(id_data);
+    fetchUserData()
+    fetchBPMData()
+    interval = setInterval(fetchUserData, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        setLocation('Izin lokasi ditolak')
+        return
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({})
+      const reverseGeo = await Location.reverseGeocodeAsync(
+        currentLocation.coords
+      )
+      if (reverseGeo.length > 0) {
+        setLocation(reverseGeo[0].city || 'Lokasi tidak ditemukan')
+      }
+    })()
+  }, [])
+
+  const extractDurationFromId = (id_data: string): string => {
+    const match = id_data.match(/\|(\d+)_/)
+    if (!match) return '0 detik'
+    const duration = parseInt(match[1])
+    return duration >= 60
+      ? `${Math.floor(duration / 60)} menit`
+      : `${duration} detik`
+  }
+
+  const fetchBPMData = async () => {
+    if (!history.length) return
+
+    const id_data = encodeURIComponent(history[0].id_data)
+    setBpmLoading(true)
 
     try {
       const response = await fetch(
         `${utils.API_BASE_URL}/data/getData?id_data=${id_data}`,
         {
-          method: "GET",
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
           }
         }
-      );
+      )
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || "Gagal mendapatkan data BPM");
+        throw new Error(data.message || 'Gagal mendapatkan data BPM')
       }
 
       if (data.data.data && data.data.id_data) {
-        const calculatedBpm = calculateBPM(data.data.data);
-        const formattedBpm = parseFloat(calculatedBpm).toFixed(2);
-        setBpm(formattedBpm);
+        const calculatedBpm = calculateHeartRate(data.data.data)
+        const formattedBpm = parseFloat(calculatedBpm).toFixed(2)
+        setBpm(formattedBpm)
       } else {
-        console.warn("Data BPM tidak ditemukan dalam respons.");
-        setBpm("XX");
+        console.warn('Data BPM tidak ditemukan dalam respons.')
+        setBpmLoading(true)
       }
     } catch (err) {
-      console.log("Data ID terakhir:", id_data);
-      console.error("Error mengambil data BPM:", err);
-      setBpm("XX");
+      console.error('Error mengambil data BPM:', err)
+      setBpm('Error!')
+    } finally {
+      setBpmLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchBPMData();
-    const interval = setInterval(fetchBPMData, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    fetchBPMData()
+    const interval = setInterval(fetchBPMData, 5000)
+    return () => clearInterval(interval)
+  }, [history])
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size='large' color='#0000ff' />
   }
 
   if (error) {
     return (
-      <Text style={{ color: "red", textAlign: "center" }}>
-        Error: {error}
-      </Text>
-    );
+      <Text style={{ color: 'red', textAlign: 'center' }}>Error: {error}</Text>
+    )
   }
 
   return (
@@ -187,21 +190,33 @@ const HomeScreen: React.FC = () => {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Pressable onPress={() => navigation.navigate("Profil")}>
+            <Pressable onPress={() => navigation.navigate('Profil')}>
               <Text style={styles.menuButton}>☰</Text>
             </Pressable>
             <View style={styles.locationContainer}>
               <Text style={styles.locationText}>Lokasi saat ini</Text>
-              <Text style={styles.locationText}>
-                📍 {location}
-              </Text>
+              <Text style={styles.locationText}>📍 {location}</Text>
             </View>
           </View>
 
           <View style={styles.lastRecord}>
             <View style={styles.lastRecordContainer}>
               <Text style={styles.lastRecordTitle}>Data Rekaman Terakhir</Text>
-              <Pressable style={styles.lastRecordButton}>
+              <Pressable
+                style={styles.lastRecordButton}
+                onPress={() => {
+                  if (history.length > 0) {
+                    const lastIdData = history[0].id_data
+                    navigation.navigate('Data', {
+                      id_data: lastIdData,
+                      tanggal_record: history[0].tanggal,
+                      durasi_record: extractDurationFromId(history[0].id_data)
+                    })
+                  } else {
+                    alert('Belum ada data rekaman!')
+                  }
+                }}
+              >
                 <Text style={styles.buttonText}>Lihat Hasil</Text>
               </Pressable>
             </View>
@@ -210,78 +225,86 @@ const HomeScreen: React.FC = () => {
               <View style={styles.resultTextContainer}>
                 <Image
                   style={styles.logoResult}
-                  source={require("../../assets/icon-callendar.png")}
+                  source={require('../../assets/icon-callendar.png')}
                 />
                 <Text style={styles.resultText}>
-                  {history.length > 0 ? history[0].tanggal : "dd/mm/yy"}
+                  {history.length > 0 ? history[0].tanggal : 'dd/mm/yy'}
                 </Text>
               </View>
 
               <View style={styles.resultTextContainer}>
                 <Image
                   style={styles.logoResult}
-                  source={require("../../assets/icon-hati.png")}
+                  source={require('../../assets/icon-hati.png')}
                 />
-                <Text style={styles.resultText}>
-                  {bpm}
-                </Text>
-                <Text style={styles.resultSatuan}>Bpm</Text>
+                {bpmLoading ? (
+                  <ActivityIndicator size='small' color='#000' />
+                ) : (
+                  <>
+                    <Text style={styles.resultText}>{bpm}</Text>
+                    <Text style={styles.resultSatuan}>Bpm</Text>
+                  </>
+                )}
               </View>
 
               <View style={styles.resultTextContainer}>
                 <Image
                   style={styles.logoResult}
-                  source={require("../../assets/icon-stopwatch.png")}
+                  source={require('../../assets/icon-stopwatch.png')}
                 />
                 <Text style={styles.resultText}>
                   {history.length > 0
-                    ? extractDurationFromId(history[0].id_data).split(" ")[0]
-                    : "XX"}
+                    ? extractDurationFromId(history[0].id_data).split(' ')[0]
+                    : 'XX'}
                 </Text>
                 <Text style={styles.resultSatuan}>
                   {history.length > 0
-                    ? extractDurationFromId(history[0].id_data).split(" ")[1]
-                    : "min"}
+                    ? extractDurationFromId(history[0].id_data).split(' ')[1]
+                    : 'min'}
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#fff"
-          }}
-        >
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
           <Text style={styles.sectionTitle}>Riwayat Rekaman</Text>
           <FlatList
             contentContainerStyle={{
-              alignItems: "center",
-              justifyContent: "center"
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
             data={history}
             keyExtractor={item => item.id_data.toString()}
-            renderItem={({ item }) =>
+            renderItem={({ item }) => (
               <View style={styles.historyItem}>
                 <View>
-                  <Text style={styles.historyItemTanggal}>
-                    {item.tanggal}
-                  </Text>
+                  <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
                   <Text style={styles.historyItemDurasi}>
                     {extractDurationFromId(item.id_data)}
                   </Text>
                 </View>
-                <Image
-                  style={styles.logoResult}
-                  source={require("../../assets/icon-data.png")}
-                />
-              </View>}
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('Data', {
+                      id_data: item.id_data,
+                      tanggal_record: item.tanggal,
+                      durasi_record: extractDurationFromId(item.id_data)
+                    })
+                  }
+                >
+                  <Image
+                    style={styles.logoResult}
+                    source={require('../../assets/icon-data.png')}
+                  />
+                </Pressable>
+              </View>
+            )}
           />
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default HomeScreen;
+export default HomeScreen
