@@ -207,10 +207,12 @@ const HomeScreen: React.FC = () => {
                 onPress={() => {
                   if (history.length > 0) {
                     const lastIdData = history[0].id_data
+                    const prevIdData = history[0+1].id_data
                     navigation.navigate('Data', {
                       id_data: lastIdData,
                       tanggal_record: history[0].tanggal,
-                      durasi_record: extractDurationFromId(history[0].id_data)
+                      durasi_record: extractDurationFromId(history[0].id_data),
+                      prev_id_data: prevIdData
                     })
                   } else {
                     alert('Belum ada data rekaman!')
@@ -276,30 +278,36 @@ const HomeScreen: React.FC = () => {
             }}
             data={history}
             keyExtractor={item => item.id_data.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.historyItem}>
-                <View>
-                  <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
-                  <Text style={styles.historyItemDurasi}>
-                    {extractDurationFromId(item.id_data)}
-                  </Text>
+            renderItem={({ item, index }) => {
+              const prevItem = history[index + 1]; // item setelahnya
+              const prevIdData = prevItem ? prevItem.id_data : null;
+
+              return (
+                <View style={styles.historyItem}>
+                  <View>
+                    <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
+                    <Text style={styles.historyItemDurasi}>
+                      {extractDurationFromId(item.id_data)}
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() =>
+                      navigation.navigate('Data', {
+                        id_data: item.id_data,
+                        tanggal_record: item.tanggal,
+                        durasi_record: extractDurationFromId(item.id_data),
+                        prev_id_data: prevIdData
+                      })
+                    }
+                  >
+                    <Image
+                      style={styles.logoResult}
+                      source={require('../../assets/icon-data.png')}
+                    />
+                  </Pressable>
                 </View>
-                <Pressable
-                  onPress={() =>
-                    navigation.navigate('Data', {
-                      id_data: item.id_data,
-                      tanggal_record: item.tanggal,
-                      durasi_record: extractDurationFromId(item.id_data)
-                    })
-                  }
-                >
-                  <Image
-                    style={styles.logoResult}
-                    source={require('../../assets/icon-data.png')}
-                  />
-                </Pressable>
-              </View>
-            )}
+              );
+            }}
           />
         </View>
       </ScrollView>
