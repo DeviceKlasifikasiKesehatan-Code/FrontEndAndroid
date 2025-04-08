@@ -77,8 +77,11 @@ export default {
   textContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    flexWrap: 'wrap'
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(19, 62, 135, 0.25)',
+    padding: 0
   },
   logoutButton: {
     backgroundColor: 'red',

@@ -207,7 +207,7 @@ const HomeScreen: React.FC = () => {
                 onPress={() => {
                   if (history.length > 0) {
                     const lastIdData = history[0].id_data
-                    const prevIdData = history[0+1].id_data
+                    const prevIdData = history[0 + 1].id_data
                     navigation.navigate('Data', {
                       id_data: lastIdData,
                       tanggal_record: history[0].tanggal,
@@ -279,13 +279,15 @@ const HomeScreen: React.FC = () => {
             data={history}
             keyExtractor={item => item.id_data.toString()}
             renderItem={({ item, index }) => {
-              const prevItem = history[index + 1]; // item setelahnya
-              const prevIdData = prevItem ? prevItem.id_data : null;
+              const prevItem = history[index + 1] // item setelahnya
+              const prevIdData = prevItem ? prevItem.id_data : null
 
               return (
                 <View style={styles.historyItem}>
                   <View>
-                    <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
+                    <Text style={styles.historyItemTanggal}>
+                      {item.tanggal}
+                    </Text>
                     <Text style={styles.historyItemDurasi}>
                       {extractDurationFromId(item.id_data)}
                     </Text>
@@ -306,7 +308,7 @@ const HomeScreen: React.FC = () => {
                     />
                   </Pressable>
                 </View>
-              );
+              )
             }}
           />
         </View>
