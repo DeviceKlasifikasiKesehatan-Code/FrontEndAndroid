@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   SafeAreaView,
   Image,
+  KeyboardAvoidingView,
   View,
   Text,
   Pressable,
@@ -94,14 +95,13 @@ const HomeScreen: React.FC = () => {
     }
 
     fetchUserData()
-    fetchBPMData()
-    interval = setInterval(fetchUserData, 5000)
+    interval = setInterval(fetchUserData, 15000) // 15 detik
 
     return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         setLocation('Izin lokasi ditolak')
@@ -168,7 +168,7 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     fetchBPMData()
-    const interval = setInterval(fetchBPMData, 5000)
+    const interval = setInterval(fetchBPMData, 60000) // 1 menit
     return () => clearInterval(interval)
   }, [history])
 
@@ -207,7 +207,7 @@ const HomeScreen: React.FC = () => {
                 onPress={() => {
                   if (history.length > 0) {
                     const lastIdData = history[0].id_data
-                    const prevIdData = history[0 + 1].id_data
+                    const prevIdData = history[0 + 1]?.id_data
                     navigation.navigate('Data', {
                       id_data: lastIdData,
                       tanggal_record: history[0].tanggal,
@@ -279,7 +279,7 @@ const HomeScreen: React.FC = () => {
             data={history}
             keyExtractor={item => item.id_data.toString()}
             renderItem={({ item, index }) => {
-              const prevItem = history[index + 1] // item setelahnya
+              const prevItem = history[index + 1]
               const prevIdData = prevItem ? prevItem.id_data : null
 
               return (

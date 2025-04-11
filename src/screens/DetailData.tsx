@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   SafeAreaView,
   Alert,
@@ -176,7 +178,12 @@ const DetailData = () => {
   }
 
   return (
+    
     <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -420,7 +427,7 @@ const DetailData = () => {
             Report Hasil
           </Text>
 
-          <View
+          {/* <View
             style={{
               alignSelf: 'center',
               paddingVertical: 5,
@@ -430,17 +437,19 @@ const DetailData = () => {
               marginTop: 10
             }}
           >
+            
+          </View> */}
+
             <Text
               style={{
-                color: 'white',
-                fontSize: 22,
+                color: healthStat === 'Normal' ? 'green' : 'red',
+                fontSize: 18,
                 textAlign: 'center',
                 fontFamily: 'MontserratBold'
               }}
             >
               {healthStat}
             </Text>
-          </View>
 
           <View
             style={{
@@ -454,15 +463,15 @@ const DetailData = () => {
             <Image
               source={require('../../assets/jantung-merah.png')}
               style={{
-                height: 50,
-                marginRight: 10,
+                height: 35,
+                marginRight: 0,
                 resizeMode: 'contain'
               }}
             />
             <Text
               style={{
-                fontSize: 26,
-                marginRight: 20,
+                fontSize: 20,
+                marginRight: 10,
                 color: 'white',
                 fontFamily: 'MontserratSemiBold'
               }}
@@ -471,7 +480,7 @@ const DetailData = () => {
             </Text>
             <Text
               style={{
-                fontSize: 26,
+                fontSize: 20,
                 color: 'white',
                 fontFamily: 'MontserratSemiBold'
               }}
@@ -502,15 +511,15 @@ const DetailData = () => {
               <Image
                 source={require('../../assets/jantung-merah.png')}
                 style={{
-                  height: 50,
-                  marginRight: 10,
+                  height: 35,
+                  marginRight: 0,
                   resizeMode: 'contain'
                 }}
               />
               <Text
                 style={{
-                  fontSize: 26,
-                  marginRight: 20,
+                  fontSize: 20,
+                  marginRight: 10,
                   color: 'white',
                   fontFamily: 'MontserratSemiBold'
                 }}
@@ -519,7 +528,7 @@ const DetailData = () => {
               </Text>
               <Text
                 style={{
-                  fontSize: 26,
+                  fontSize: 20,
                   color: 'white',
                   fontFamily: 'MontserratSemiBold'
                 }}
@@ -553,7 +562,7 @@ const DetailData = () => {
                     : hrStat === 'Perlu Waspada'
                     ? 'orange'
                     : 'red',
-                fontSize: 22,
+                fontSize: 16,
                 textAlign: 'center',
                 fontFamily: 'MontserratSemiBold'
               }}
@@ -566,32 +575,33 @@ const DetailData = () => {
             onPress={handleDeleteRecord}
             disabled={isDeleting}
             style={{
-              padding: 10,
+              paddingVertical: 5,
+              paddingHorizontal: 25,
               backgroundColor:
                 currentPage >= totalPages - 1 || loading ? '#ccc' : 'red',
               borderRadius: 10,
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: 20,
-              alignSelf: 'center',
-              width: '80%'
+              gapVertical: 20,
+              alignSelf: 'center'
             }}
           >
             <Text
               style={{
                 color: 'white',
-                fontSize: 22,
+                fontSize: 18,
                 textAlign: 'center',
                 fontFamily: 'MontserratBold'
               }}
             >
               Hapus Record
             </Text>
-            <Icon name='trash' size={28} color='#FFFFFF' />
+            <Icon name='trash' size={22} color='#FFFFFF' />
           </Pressable>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
