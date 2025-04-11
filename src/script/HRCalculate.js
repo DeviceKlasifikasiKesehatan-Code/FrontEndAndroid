@@ -1,5 +1,3 @@
-const samplingRate = 200;
-
 function calculateHeartRate (ecgData, samplingRate = 200) {
   const filtered = movingAverageFilter (ecgData, 5);
   const peaks = findRPeaks (filtered, samplingRate);
@@ -22,7 +20,7 @@ function movingAverageFilter (data, windowSize = 5) {
 
 function findRPeaks (ecgData, samplingRate = 200) {
   const peaks = [];
-  const threshold = 0.7 * Math.max (...ecgData);
+  const threshold = 0.6 * Math.max (...ecgData);
   let lastPeakIndex = -Infinity;
   const minDistance = Math.floor (0.3 * samplingRate);
 
