@@ -101,7 +101,7 @@ const HomeScreen: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         setLocation('Izin lokasi ditolak')
@@ -271,8 +271,19 @@ const HomeScreen: React.FC = () => {
 
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
           <Text style={styles.sectionTitle}>Riwayat Rekaman</Text>
+<<<<<<< HEAD
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             {history.map((item, index) => {
+=======
+          <FlatList
+            contentContainerStyle={{
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            data={history}
+            keyExtractor={item => item.id_data.toString()}
+            renderItem={({ item, index }) => {
+>>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
               const prevItem = history[index + 1]
               const prevIdData = prevItem ? prevItem.id_data : null
 
