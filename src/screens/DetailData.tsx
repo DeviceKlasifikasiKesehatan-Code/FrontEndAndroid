@@ -177,24 +177,10 @@ const DetailData = () => {
   }
 
   return (
-    
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
-<<<<<<< HEAD
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-=======
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingTop: screenWidth * 0.13,
-          alignItems: 'center',
-          gap: 10
-        }}
->>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
       >
         <ScrollView
           contentContainerStyle={{
@@ -441,55 +427,7 @@ const DetailData = () => {
               Report Hasil
             </Text>
 
-<<<<<<< HEAD
             {/* <View
-=======
-          <Pressable
-            onPress={() => {
-              if (currentPage < totalPages - 1) {
-                setLoading(true)
-                setTimeout(() => {
-                  setCurrentPage(prev => prev + 1)
-                  setLoading(false)
-                }, 200)
-              }
-            }}
-            disabled={currentPage >= totalPages - 1 || loading}
-            style={{
-              padding: 10,
-              backgroundColor:
-                currentPage >= totalPages - 1 || loading ? '#ccc' : '#133E87',
-              borderRadius: 300
-            }}
-          >
-            <Icon name='arrow-right' size={28} color='#FFFFFF' />
-          </Pressable>
-        </View>
-
-        <View
-          style={{
-            backgroundColor: '#3560A0',
-            padding: 20,
-            borderTopLeftRadius: 100,
-            borderTopRightRadius: 100,
-            width: '100%',
-            flex: 1,
-            gap: 10
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 24,
-              alignSelf: 'center',
-              color: 'white',
-              fontFamily: 'MontserratSemiBold'
-            }}
-          >
-            Report Hasil
-          </Text>
-
-          {/* <View
->>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
             style={{
               alignSelf: 'center',
               paddingVertical: 5,
@@ -513,57 +451,6 @@ const DetailData = () => {
               {healthStat}
             </Text>
 
-<<<<<<< HEAD
-=======
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              justifyContent: 'flex-start',
-              width: '100%',
-              paddingHorizontal: 20
-            }}
-          >
-            <Image
-              source={require('../../assets/jantung-merah.png')}
-              style={{
-                height: 35,
-                marginRight: 0,
-                resizeMode: 'contain'
-              }}
-            />
-            <Text
-              style={{
-                fontSize: 20,
-                marginRight: 10,
-                color: 'white',
-                fontFamily: 'MontserratSemiBold'
-              }}
-            >
-              HR
-            </Text>
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'white',
-                fontFamily: 'MontserratSemiBold'
-              }}
-            >
-              {bpm}
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                color: 'white',
-                fontFamily: 'MontserratSemiBold'
-              }}
-            >
-              Bpm
-            </Text>
-          </View>
-
-          {prev_id_data && (
->>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
             <View
               style={{
                 flexDirection: 'row',
@@ -662,21 +549,9 @@ const DetailData = () => {
 
             <View
               style={{
-<<<<<<< HEAD
                 alignSelf: 'center',
                 borderRadius: 10,
                 marginTop: 10
-=======
-                color:
-                  hrStat === 'Normal'
-                    ? '#58FF6C'
-                    : hrStat === 'Perlu Waspada'
-                    ? 'orange'
-                    : 'red',
-                fontSize: 16,
-                textAlign: 'center',
-                fontFamily: 'MontserratSemiBold'
->>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
               }}
             >
               <Text
@@ -725,41 +600,7 @@ const DetailData = () => {
               <Icon name='trash' size={22} color='#FFFFFF' />
             </Pressable>
           </View>
-<<<<<<< HEAD
         </ScrollView>
-=======
-
-          <Pressable
-            onPress={handleDeleteRecord}
-            disabled={isDeleting}
-            style={{
-              paddingVertical: 5,
-              paddingHorizontal: 25,
-              backgroundColor:
-                currentPage >= totalPages - 1 || loading ? '#ccc' : 'red',
-              borderRadius: 10,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gapVertical: 20,
-              alignSelf: 'center'
-            }}
-          >
-            <Text
-              style={{
-                color: 'white',
-                fontSize: 18,
-                textAlign: 'center',
-                fontFamily: 'MontserratBold'
-              }}
-            >
-              Hapus Record
-            </Text>
-            <Icon name='trash' size={22} color='#FFFFFF' />
-          </Pressable>
-        </View>
-      </ScrollView>
->>>>>>> 665ea1f5210880a46baf2cbd218f91f376377cf6
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
