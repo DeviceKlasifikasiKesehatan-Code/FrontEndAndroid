@@ -29,6 +29,14 @@ const HomeScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const navigation = useNavigation()
 
+  const getDurationParts = (id_data: string) => {
+    const parts = extractDurationFromId(id_data).split(' ')
+    return {
+      value: parts[0] || '0',
+      unit: parts[1] || 'detik'
+    }
+  }
+
   useEffect(() => {
     let interval: NodeJS.Timeout
 
@@ -176,18 +184,15 @@ const HomeScreen: React.FC = () => {
     return <ActivityIndicator size='large' color='#0000ff' />
   }
 
-  if (error) {
-    return (
-      <Text style={{ color: 'red', textAlign: 'center' }}>Error: {error}</Text>
-    )
-  }
+  // if (error) {
+  //   return (
+  //     <Text style={{ color: 'red', textAlign: 'center' }}>Ada Error: {error}</Text>
+  //   )
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.header}>
             <Pressable onPress={() => navigation.navigate('Profil')}>
@@ -207,7 +212,7 @@ const HomeScreen: React.FC = () => {
                 onPress={() => {
                   if (history.length > 0) {
                     const lastIdData = history[0].id_data
-                    const prevIdData = history[0 + 1]?.id_data
+                    const prevIdData = history[1]?.id_data
                     navigation.navigate('Data', {
                       id_data: lastIdData,
                       tanggal_record: history[0].tanggal,
@@ -225,20 +230,14 @@ const HomeScreen: React.FC = () => {
 
             <View style={styles.lastResultContainer}>
               <View style={styles.resultTextContainer}>
-                <Image
-                  style={styles.logoResult}
-                  source={require('../../assets/icon-callendar.png')}
-                />
+                <Image style={styles.logoResult} source={require('../../assets/icon-callendar.png')} />
                 <Text style={styles.resultText}>
                   {history.length > 0 ? history[0].tanggal : 'dd/mm/yy'}
                 </Text>
               </View>
 
               <View style={styles.resultTextContainer}>
-                <Image
-                  style={styles.logoResult}
-                  source={require('../../assets/icon-hati.png')}
-                />
+                <Image style={styles.logoResult} source={require('../../assets/icon-hati.png')} />
                 {bpmLoading ? (
                   <ActivityIndicator size='small' color='#000' />
                 ) : (
@@ -250,20 +249,22 @@ const HomeScreen: React.FC = () => {
               </View>
 
               <View style={styles.resultTextContainer}>
-                <Image
-                  style={styles.logoResult}
-                  source={require('../../assets/icon-stopwatch.png')}
-                />
-                <Text style={styles.resultText}>
-                  {history.length > 0
-                    ? extractDurationFromId(history[0].id_data).split(' ')[0]
-                    : 'XX'}
-                </Text>
-                <Text style={styles.resultSatuan}>
-                  {history.length > 0
-                    ? extractDurationFromId(history[0].id_data).split(' ')[1]
-                    : 'min'}
-                </Text>
+                <Image style={styles.logoResult} source={require('../../assets/icon-stopwatch.png')} />
+                {history.length > 0 ? (
+                  <>
+                    <Text style={styles.resultText}>
+                      {getDurationParts(history[0].id_data).value}
+                    </Text>
+                    <Text style={styles.resultSatuan}>
+                      {getDurationParts(history[0].id_data).unit}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.resultText}>Belum</Text>
+                    <Text style={styles.resultSatuan}>ada record</Text>
+                  </>
+                )}
               </View>
             </View>
           </View>
@@ -272,38 +273,39 @@ const HomeScreen: React.FC = () => {
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
           <Text style={styles.sectionTitle}>Riwayat Rekaman</Text>
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-            {history.map((item, index) => {
-              const prevItem = history[index + 1]
-              const prevIdData = prevItem ? prevItem.id_data : null
+            {history.length === 0 ? (
+              <Text style={{ color: '#888', marginTop: 10 }}>
+                Belum ada data rekaman
+              </Text>
+            ) : (
+              history.map((item, index) => {
+                const prevItem = history[index + 1]
+                const prevIdData = prevItem ? prevItem.id_data : null
 
-              return (
-                <View style={styles.historyItem} key={item.id_data.toString()}>
-                  <View>
-                    <Text style={styles.historyItemTanggal}>
-                      {item.tanggal}
-                    </Text>
-                    <Text style={styles.historyItemDurasi}>
-                      {extractDurationFromId(item.id_data)}
-                    </Text>
+                return (
+                  <View style={styles.historyItem} key={item.id_data.toString()}>
+                    <View>
+                      <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
+                      <Text style={styles.historyItemDurasi}>
+                        {extractDurationFromId(item.id_data)}
+                      </Text>
+                    </View>
+                    <Pressable
+                      onPress={() =>
+                        navigation.navigate('Data', {
+                          id_data: item.id_data,
+                          tanggal_record: item.tanggal,
+                          durasi_record: extractDurationFromId(item.id_data),
+                          prev_id_data: prevIdData
+                        })
+                      }
+                    >
+                      <Image style={styles.logoResult} source={require('../../assets/icon-data.png')} />
+                    </Pressable>
                   </View>
-                  <Pressable
-                    onPress={() =>
-                      navigation.navigate('Data', {
-                        id_data: item.id_data,
-                        tanggal_record: item.tanggal,
-                        durasi_record: extractDurationFromId(item.id_data),
-                        prev_id_data: prevIdData
-                      })
-                    }
-                  >
-                    <Image
-                      style={styles.logoResult}
-                      source={require('../../assets/icon-data.png')}
-                    />
-                  </Pressable>
-                </View>
-              )
-            })}
+                )
+              })
+            )}
           </View>
         </View>
       </ScrollView>

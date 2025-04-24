@@ -21,7 +21,7 @@ const RegistrasiScreen: React.FC = () => {
   const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [deviceID, setDeviceID] = useState<string>("");
+  const [deviceID, setDeviceID] = useState<string>("-");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(
@@ -71,7 +71,6 @@ const RegistrasiScreen: React.FC = () => {
     if (!nik) missingFields.push("NIK");
     if (!phone) missingFields.push("Nomor Telepon");
     if (!email) missingFields.push("Email");
-    if (!deviceID) missingFields.push("ID Perangkat");
     if (!password) missingFields.push("Password");
     if (!confirmPassword) missingFields.push("Ulangi Password");
 
@@ -171,15 +170,6 @@ const RegistrasiScreen: React.FC = () => {
                   {emailError}
                 </Text>
               : null}
-
-            <TextInput
-              style={styles.input}
-              placeholder="ID Perangkat"
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={deviceID}
-              onChangeText={setDeviceID}
-            />
 
             <View style={styles.passwordContainer}>
               <TextInput

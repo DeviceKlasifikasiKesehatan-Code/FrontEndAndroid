@@ -86,7 +86,8 @@ const ProfilScreen: React.FC = () => {
         alamat: "/auth/update/alamat",
         nomor_telp: "/auth/update/nomor-telepon",
         nik: "/auth/update/nik",
-        tanggal_lahir: "/auth/update/tanggal-lahir"
+        tanggal_lahir: "/auth/update/tanggal-lahir",
+        id_sensor: "/auth/update/alat"
       };
 
       const endpoint = endpointMap[fieldKey];
@@ -103,6 +104,11 @@ const ProfilScreen: React.FC = () => {
           email: userData.email,
           [fieldKey]: newValue
         })
+      });
+
+      console.log("Data yang dikirim ke API:", {
+        email: userData.email,
+        [fieldKey]: newValue
       });
 
       const result = await response.json();
@@ -203,7 +209,8 @@ const ProfilScreen: React.FC = () => {
               { label: "Nomor Telepon", key: "nomor_telp" },
               { label: "NIK", key: "nik" },
               { label: "Email", key: "email" },
-              { label: "Tanggal Lahir", key: "tanggal_lahir" }
+              { label: "Tanggal Lahir", key: "tanggal_lahir" },
+              { label: "ID Alat", key: "id_sensor" }
             ].map(item =>
               <View key={item.key} style={styles.textContainer}>
                 <Text style={styles.label}>
