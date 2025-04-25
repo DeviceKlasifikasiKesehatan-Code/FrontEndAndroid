@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native'
 import styles from '../styles/HomeStyles'
 import { calculateHeartRate } from '../script/HRCalculate'
 import utils from '../script/utils'
+import FontAwesome from 'react-native-vector-icons/FontAwesome6'
 
 const HomeScreen: React.FC = () => {
   const [location, setLocation] = useState<string>('Mengambil lokasi...')
@@ -184,23 +185,38 @@ const HomeScreen: React.FC = () => {
     return <ActivityIndicator size='large' color='#0000ff' />
   }
 
-  // if (error) {
-  //   return (
-  //     <Text style={{ color: 'red', textAlign: 'center' }}>Ada Error: {error}</Text>
-  //   )
-  // }
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View style={styles.header}>
             <Pressable onPress={() => navigation.navigate('Profil')}>
-              <Text style={styles.menuButton}>☰</Text>
+              <FontAwesome name='hospital-user' size={25} color={'#133E87'} />
             </Pressable>
             <View style={styles.locationContainer}>
-              <Text style={styles.locationText}>Lokasi saat ini</Text>
-              <Text style={styles.locationText}>📍 {location}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View>
+                  <Text style={styles.locationText}>Lokasi saat ini</Text>
+                  <Text style={styles.locationText}>📍 {location}</Text>
+                </View>
+                <Pressable
+                  onPress={() => navigation.navigate('HospitalMap')}
+                  style={{
+                    marginLeft: 10,
+                    borderWidth: 2,
+                    borderColor: '#133E87',
+                    borderRadius: 5,
+                    padding: 5,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <FontAwesome name='hospital' size={25} color={'#133E87'} />
+                </Pressable>
+              </View>
             </View>
           </View>
 
@@ -230,14 +246,20 @@ const HomeScreen: React.FC = () => {
 
             <View style={styles.lastResultContainer}>
               <View style={styles.resultTextContainer}>
-                <Image style={styles.logoResult} source={require('../../assets/icon-callendar.png')} />
+                <Image
+                  style={styles.logoResult}
+                  source={require('../../assets/icon-callendar.png')}
+                />
                 <Text style={styles.resultText}>
                   {history.length > 0 ? history[0].tanggal : 'dd/mm/yy'}
                 </Text>
               </View>
 
               <View style={styles.resultTextContainer}>
-                <Image style={styles.logoResult} source={require('../../assets/icon-hati.png')} />
+                <Image
+                  style={styles.logoResult}
+                  source={require('../../assets/icon-hati.png')}
+                />
                 {bpmLoading ? (
                   <ActivityIndicator size='small' color='#000' />
                 ) : (
@@ -249,7 +271,10 @@ const HomeScreen: React.FC = () => {
               </View>
 
               <View style={styles.resultTextContainer}>
-                <Image style={styles.logoResult} source={require('../../assets/icon-stopwatch.png')} />
+                <Image
+                  style={styles.logoResult}
+                  source={require('../../assets/icon-stopwatch.png')}
+                />
                 {history.length > 0 ? (
                   <>
                     <Text style={styles.resultText}>
@@ -283,9 +308,14 @@ const HomeScreen: React.FC = () => {
                 const prevIdData = prevItem ? prevItem.id_data : null
 
                 return (
-                  <View style={styles.historyItem} key={item.id_data.toString()}>
+                  <View
+                    style={styles.historyItem}
+                    key={item.id_data.toString()}
+                  >
                     <View>
-                      <Text style={styles.historyItemTanggal}>{item.tanggal}</Text>
+                      <Text style={styles.historyItemTanggal}>
+                        {item.tanggal}
+                      </Text>
                       <Text style={styles.historyItemDurasi}>
                         {extractDurationFromId(item.id_data)}
                       </Text>
@@ -300,7 +330,10 @@ const HomeScreen: React.FC = () => {
                         })
                       }
                     >
-                      <Image style={styles.logoResult} source={require('../../assets/icon-data.png')} />
+                      <Image
+                        style={styles.logoResult}
+                        source={require('../../assets/icon-data.png')}
+                      />
                     </Pressable>
                   </View>
                 )

@@ -6,7 +6,8 @@ export default {
   topContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 75,
+    paddingTop: 50,
+    paddingBottom: 75,
     paddingHorizontal: 20,
     backgroundColor: '#133E87',
     gap: 20

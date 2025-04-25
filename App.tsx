@@ -14,6 +14,7 @@ import RegistrasiScreen from './src/screens/Registrasi'
 import HomeScreen from './src/screens/Home'
 import ProfilScreen from './src/screens/Profil'
 import DetailData from './src/screens/DetailData'
+import HospitalMap from './src/screens/HospitalMaps'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 
@@ -24,7 +25,8 @@ const screens = [
   { name: 'Gerbang', component: GerbangScreen },
   { name: 'Registrasi', component: RegistrasiScreen },
   { name: 'Profil', component: ProfilScreen },
-  { name: 'Data', component: DetailData }
+  { name: 'Data', component: DetailData },
+  { name: 'HospitalMap', component: HospitalMap }
 ]
 
 const App: React.FC = () => {
